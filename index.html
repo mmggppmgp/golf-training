@@ -186,7 +186,7 @@
 // DATA & STATE
 // ═══════════════════════════════════════════════════════════════
 
-const START = '2025-03-02';
+const START = '2026-02-23';
 let completed = {};
 let speedLog = {};
 let skippedDays = [];
@@ -415,79 +415,104 @@ const lightEx7=[ex("Full Warm-Up Routine",1,"5 min","—","This IS your pre-roun
 const lightEx8=[ex("Full Dynamic Warm-Up",1,"5 min","—","The culmination of 8 weeks of work"),ex("Activation Circuit",1,"5 min","—","Glutes, core, shoulders – fire everything up")];
 const finalDrills=[dr("Stock Shot x10",1,"10 balls","—","Hit your go-to shot. Feel the confidence."),dr("Driver: Let It Rip",1,"10 balls","—","Full speed. See how far you've come.")];
 
-// ── 8-WEEK SCHEDULE ──
+// Week 0 - Recovery/Baseline week (surgery Thu-Sun off)
+const w0Ex=[ex("Foam Roll – T-Spine",1,"90 sec","—","Gentle. Just open up the thoracic spine."),ex("Foam Roll – Lats & Glutes",1,"90 sec","—","Easy pressure, work out any tightness."),ex("90/90 Hip Switches",1,"6 each side","30s","Slow, controlled. Just mobility."),ex("Cat-Cow Stretches",1,"10 reps","—","Gentle spinal mobility, breathe deep."),ex("Glute Bridges",1,"10","30s","Light activation, no load.")];
+const w0Dr=[dr("Alignment Stick – Setup Check",1,"10 balls","—","Check ball position, alignment, posture basics"),dr("Putting – Straight 3-Footers",1,"20 putts","—","Simple stroke work, build rhythm")];
+const w0Sp=[sp("Warm-Up Swings – 50%",1,"5 swings","—","Easy, smooth tempo only"),sp("LOG 5 DRIVER SWINGS",1,"5 swings","—","⚡ Baseline! Record each swing speed on your launch monitor")];
+
+LINKS["Cat-Cow Stretches"] = "https://www.youtube.com/results?search_query=cat+cow+stretch+spinal+mobility+warm+up";
+
+// ── FULL SCHEDULE ──
 const WEEKS=[
+// WEEK 0: Recovery/Baseline (Mon-Wed train, Thu-Sun off for surgery)
+{phase:"Recovery & Baseline",weekNum:0,days:[
+  {label:"Day 1 – Baseline & Mobility",exercises:w0Ex,drills:w0Dr,speed:w0Sp},
+  {label:"Day 2 – Mobility & Speed Log",exercises:w0Ex,drills:w0Dr,speed:w0Sp},
+  {label:"Day 3 – Baseline Wrap-Up",exercises:w0Ex,drills:w0Dr,speed:w0Sp},
+  {label:"REST – Surgery Recovery",isRest:true,notes:"Rest up. Surgery day. Take care of yourself."},
+  {label:"REST – Surgery Recovery",isRest:true,notes:"Recovery day. Stay off your feet. Hydrate."},
+  {label:"REST – Surgery Recovery",isRest:true,notes:"Continue resting. Light walking if cleared by your doctor."},
+  {label:"REST – Surgery Recovery",isRest:true,notes:"Last recovery day before Week 1. Ease back in tomorrow."},
+]},
+// WEEK 1: Foundation & Activation (Mon-Sat train, Sun rest)
 {phase:"Foundation & Activation",weekNum:1,days:[
   {label:"Day 1 – Foundation A",exercises:fEx1,drills:fDr1,speed:fSp},
   {label:"Day 2 – Foundation B",exercises:fEx2,drills:fDr2,speed:fSp},
-  {label:"REST DAY",isRest:true,notes:"Active recovery: 20-min walk, light stretching, foam roll. Let your body adapt."},
   {label:"Day 3 – Foundation A+",exercises:fEx1,drills:fDr2,speed:fSp},
   {label:"Day 4 – Foundation B+",exercises:fEx2,drills:fDr1,speed:fSp},
-  {label:"REST DAY",isRest:true,notes:"Full rest or gentle yoga. Hydrate well. Sleep 7-8 hours."},
-  {label:"Day 5 – Light Speed Only",exercises:lightEx1,drills:fDr1,speed:fSp},
+  {label:"Day 5 – Foundation Mix",exercises:[...fEx1.slice(0,4),...fEx2.slice(4)],drills:fDr1,speed:fSp},
+  {label:"Day 6 – Light Speed Only",exercises:lightEx1,drills:fDr2,speed:fSp},
+  {label:"REST DAY",isRest:true,notes:"Sunday family day. Recharge with the people that matter most."},
 ]},
+// WEEK 2: Foundation & Activation (Mon-Sat train, Sun rest)
 {phase:"Foundation & Activation",weekNum:2,days:[
   {label:"Day 1 – Foundation A (Progress)",exercises:fEx1,drills:fDr1,speed:fSp},
   {label:"Day 2 – Foundation B (Progress)",exercises:fEx2,drills:fDr2,speed:fSp},
-  {label:"REST DAY",isRest:true,notes:"Walk 20-30 min. Light foam rolling. Mental game: visualize your swing."},
   {label:"Day 3 – Foundation Mix",exercises:[...fEx1.slice(0,4),...fEx2.slice(4)],drills:fDr2,speed:fSp},
   {label:"Day 4 – Foundation Full",exercises:fEx2,drills:fDr1,speed:fSp},
-  {label:"REST DAY",isRest:true,notes:"Rest day. Go spend time with the family! Your body needs recovery."},
-  {label:"Day 5 – Speed Focus",exercises:lightEx2,drills:fDr2,speed:fSp},
+  {label:"Day 5 – Foundation A+ (Volume)",exercises:fEx1,drills:fDr2,speed:fSp},
+  {label:"Day 6 – Speed Focus",exercises:lightEx2,drills:fDr1,speed:fSp},
+  {label:"REST DAY",isRest:true,notes:"Sunday family day. Your body is adapting – let it recover."},
 ]},
+// WEEK 3: Building Power (Mon-Sat train, Sun rest)
 {phase:"Building Power",weekNum:3,days:[
   {label:"Day 1 – Power A",exercises:bEx1,drills:bDr1,speed:bSp},
   {label:"Day 2 – Power B",exercises:bEx2,drills:bDr2,speed:bSp},
-  {label:"REST DAY",isRest:true,notes:"Recovery walk, stretching. Your muscles are adapting to the new load."},
   {label:"Day 3 – Power A+",exercises:bEx1,drills:bDr2,speed:bSp},
   {label:"Day 4 – Power B+",exercises:bEx2,drills:bDr1,speed:bSp},
-  {label:"REST DAY",isRest:true,notes:"Full rest. Family day. Trust the process."},
-  {label:"Day 5 – Speed + Drills",exercises:lightEx4,drills:bDr1,speed:bSp},
+  {label:"Day 5 – Power Mix",exercises:[...bEx1.slice(0,4),...bEx2.slice(4)],drills:bDr2,speed:bSp},
+  {label:"Day 6 – Speed + Drills",exercises:lightEx4,drills:bDr1,speed:bSp},
+  {label:"REST DAY",isRest:true,notes:"Sunday family day. Trust the process – you're building real power."},
 ]},
+// WEEK 4: Building Power (Mon-Sat train, Sun rest)
 {phase:"Building Power",weekNum:4,days:[
   {label:"Day 1 – Power A (Intensity Up)",exercises:bEx1,drills:bDr1,speed:bSp},
   {label:"Day 2 – Power B (Intensity Up)",exercises:bEx2,drills:bDr2,speed:bSp},
-  {label:"REST DAY",isRest:true,notes:"Light walk + foam roll. You're halfway through the program!"},
   {label:"Day 3 – Power Mix",exercises:[...bEx1.slice(0,4),...bEx2.slice(4)],drills:bDr2,speed:bSp},
   {label:"Day 4 – Power Full",exercises:bEx2,drills:bDr1,speed:bSp},
-  {label:"REST DAY",isRest:true,notes:"DELOAD FEEL: take it easy. 4 weeks of work banked. Recovery is growth."},
-  {label:"Day 5 – Light Speed",exercises:lightEx3,drills:bDr2,speed:bSp},
+  {label:"Day 5 – Power A+ (Volume)",exercises:bEx1,drills:bDr2,speed:bSp},
+  {label:"Day 6 – Light Speed",exercises:lightEx3,drills:bDr1,speed:bSp},
+  {label:"REST DAY",isRest:true,notes:"Sunday family day. Halfway through! DELOAD feel – recovery is growth."},
 ]},
+// WEEK 5: Peak Power & Speed (Mon-Sat train, Sun rest)
 {phase:"Peak Power & Speed",weekNum:5,days:[
   {label:"Day 1 – Peak A",exercises:pEx1,drills:pDr1,speed:pSp},
   {label:"Day 2 – Peak B",exercises:pEx2,drills:pDr2,speed:pSp},
-  {label:"REST DAY",isRest:true,notes:"You're in the peak phase. Sleep is your #1 supplement. Aim for 8 hours."},
   {label:"Day 3 – Peak A+",exercises:pEx1,drills:pDr2,speed:pSp},
   {label:"Day 4 – Peak B+",exercises:pEx2,drills:pDr1,speed:pSp},
-  {label:"REST DAY",isRest:true,notes:"Full rest. Stretch if you feel tight. Mental visualization."},
-  {label:"Day 5 – Speed Chase",exercises:lightEx5,drills:pDr1,speed:pSp},
+  {label:"Day 5 – Peak Mix",exercises:[...pEx1.slice(0,4),...pEx2.slice(4)],drills:pDr2,speed:pSp},
+  {label:"Day 6 – Speed Chase",exercises:lightEx5,drills:pDr1,speed:pSp},
+  {label:"REST DAY",isRest:true,notes:"Sunday family day. Peak phase – sleep is your #1 supplement. Aim for 8 hours tonight."},
 ]},
+// WEEK 6: Peak Power & Speed (Mon-Sat train, Sun rest)
 {phase:"Peak Power & Speed",weekNum:6,days:[
   {label:"Day 1 – Peak A (Max Effort)",exercises:pEx1,drills:pDr1,speed:pSp},
   {label:"Day 2 – Peak B (Max Effort)",exercises:pEx2,drills:pDr2,speed:pSp},
-  {label:"REST DAY",isRest:true,notes:"Recovery. Light stretching. You should be seeing speed gains by now!"},
   {label:"Day 3 – Peak Mix",exercises:[...pEx1.slice(0,4),...pEx2.slice(4)],drills:pDr2,speed:pSp},
   {label:"Day 4 – Peak Full",exercises:pEx2,drills:pDr1,speed:pSp},
-  {label:"REST DAY",isRest:true,notes:"Rest. Two weeks left. Stay committed but recover well."},
-  {label:"Day 5 – Speed & Drills",exercises:lightEx6,drills:pDr2,speed:pSp},
+  {label:"Day 5 – Peak A+ (Volume)",exercises:pEx1,drills:pDr2,speed:pSp},
+  {label:"Day 6 – Speed & Drills",exercises:lightEx6,drills:pDr2,speed:pSp},
+  {label:"REST DAY",isRest:true,notes:"Sunday family day. Two weeks left. You should be seeing speed gains!"},
 ]},
+// WEEK 7: Maintain & Integrate (Mon-Sat train, Sun rest)
 {phase:"Maintain & Integrate",weekNum:7,days:[
   {label:"Day 1 – Maintain A",exercises:mEx1,drills:mDr1,speed:mSp},
   {label:"Day 2 – Maintain B",exercises:mEx2,drills:mDr2,speed:mSp},
-  {label:"REST DAY",isRest:true,notes:"Active rest. Play a casual round if you can – feel the gains!"},
   {label:"Day 3 – Maintain A+",exercises:mEx1,drills:mDr2,speed:mSp},
   {label:"Day 4 – Maintain B+",exercises:mEx2,drills:mDr1,speed:mSp},
-  {label:"REST DAY",isRest:true,notes:"Rest up. One week left. You've done incredible work."},
-  {label:"Day 5 – Integration",exercises:lightEx7,drills:mDr1,speed:mSp},
+  {label:"Day 5 – Maintain Mix",exercises:[...mEx1.slice(0,4),...mEx2.slice(4)],drills:mDr2,speed:mSp},
+  {label:"Day 6 – Integration",exercises:lightEx7,drills:mDr1,speed:mSp},
+  {label:"REST DAY",isRest:true,notes:"Sunday family day. One week left. You've done incredible work."},
 ]},
+// WEEK 8: Maintain & Integrate (Mon-Sat train, Sun rest)
 {phase:"Maintain & Integrate",weekNum:8,days:[
   {label:"Day 1 – Final Push A",exercises:mEx1,drills:mDr1,speed:mSp},
   {label:"Day 2 – Final Push B",exercises:mEx2,drills:mDr2,speed:mSp},
-  {label:"REST DAY",isRest:true,notes:"Light day. Foam roll, stretch, visualize your best round."},
   {label:"Day 3 – Final Push A+",exercises:mEx1,drills:mDr2,speed:mSp},
   {label:"Day 4 – Final Push B+",exercises:mEx2,drills:mDr1,speed:mSp},
-  {label:"REST DAY",isRest:true,notes:"Recovery before your final speed test tomorrow!"},
+  {label:"Day 5 – Final Push Mix",exercises:[...mEx1.slice(0,4),...mEx2.slice(4)],drills:mDr2,speed:mSp},
   {label:"FINAL DAY – Speed Test & Celebration",exercises:lightEx8,drills:finalDrills,speed:mSp},
+  {label:"REST DAY",isRest:true,notes:"Sunday family day. Program complete. Celebrate with your family! 🏆"},
 ]},
 ];
 
@@ -517,7 +542,7 @@ function buildSchedule() {
 // HELPERS
 // ═══════════════════════════════════════════════════════════════
 
-const PHASE_COLORS={"Foundation & Activation":"#34c759","Building Power":"#007aff","Peak Power & Speed":"#ff3b30","Maintain & Integrate":"#ff9500"};
+const PHASE_COLORS={"Recovery & Baseline":"#8e8e93","Foundation & Activation":"#34c759","Building Power":"#007aff","Peak Power & Speed":"#ff3b30","Maintain & Integrate":"#ff9500"};
 function pc(phase) { return PHASE_COLORS[phase]||'#4ade80'; }
 function fmt(d) {
   try {
@@ -880,8 +905,9 @@ function renderSettings() {
   html+=`</div></div>`;
 
   html+=`<div class="settings-card"><h3>PROGRAM INFO</h3><div class="info-text">`;
-  html+=`<strong>Start Date:</strong> March 2, 2025<br><strong>Duration:</strong> 8 Weeks (56 days + skipped)<br><strong>Training Days:</strong> 5 per week<br><strong>Rest Days:</strong> 2 per week (built in)<br><br>`;
+  html+=`<strong>Start Date:</strong> February 23, 2026<br><strong>Duration:</strong> Week 0 (Recovery) + 8 Weeks Training<br><strong>Training Days:</strong> 6 per week (Mon–Sat)<br><strong>Rest Days:</strong> Sundays (family day)<br><br>`;
   html+=`<strong>Phases:</strong><br>`;
+  html+=`<span style="color:#8e8e93">●</span> Week 0: Recovery & Baseline<br>`;
   html+=`<span style="color:#34c759">●</span> Weeks 1-2: Foundation & Activation<br>`;
   html+=`<span style="color:#007aff">●</span> Weeks 3-4: Building Power<br>`;
   html+=`<span style="color:#ff3b30">●</span> Weeks 5-6: Peak Power & Speed<br>`;
