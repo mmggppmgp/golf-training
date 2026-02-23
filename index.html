@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Golf Speed">
+<title>Golf Performance – 8 Week Speed Program</title>
+<style>
+  :root {
+    --bg: #f5f5f7; --card: #ffffff; --border: #e2e2e7; --text: #1d1d1f; --dim: #86868b; --vdim: #aeaeb2;
+    --green: #34c759; --blue: #007aff; --red: #ff3b30; --yellow: #ff9500;
+    --accent: #007aff;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Segoe UI',system-ui,sans-serif; line-height:1.5; padding-top:var(--safe-top); padding-bottom:var(--safe-bottom); overflow-x:hidden; }
+  button { font-family:inherit; cursor:pointer; border:none; -webkit-appearance:none; }
+  input { font-family:inherit; -webkit-appearance:none; }
+
+  /* Top bar */
+  .topbar { position:sticky; top:0; z-index:100; background:rgba(245,245,247,0.88); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .topbar-inner { max-width:640px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; }
+  .topbar h1 { font-size:15px; font-weight:800; letter-spacing:1px; color:var(--text); }
+  .topbar .sub { font-size:10px; color:var(--dim); letter-spacing:2px; margin-top:1px; }
+  .nav-btns { display:flex; gap:2px; }
+  .nav-btn { padding:8px 12px; border-radius:8px; background:transparent; color:var(--vdim); font-size:17px; transition:all .15s; }
+  .nav-btn.active { background:#e8e8ed; color:var(--text); }
+
+  /* Main container */
+  .container { max-width:640px; margin:0 auto; padding:16px 16px 100px; }
+
+  /* Stats */
+  .stats-row { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .stat-card { flex:1; min-width:70px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 10px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+  .stat-card .num { font-size:24px; font-weight:800; color:var(--text); }
+  .stat-card .label { font-size:10px; color:var(--dim); letter-spacing:.8px; margin-top:2px; }
+
+  /* Progress bar */
+  .prog-bar { background:#e8e8ed; border-radius:8px; height:6px; margin-bottom:24px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:8px; transition:width .5s; }
+  .prog-fill.rainbow { background:linear-gradient(90deg,var(--green),var(--blue),var(--red),var(--yellow)); }
+
+  /* Big action button */
+  .big-btn { width:100%; padding:15px 20px; border-radius:12px; background:var(--accent); color:#fff; font-weight:700; font-size:15px; letter-spacing:.3px; margin-bottom:20px; transition:all .15s; box-shadow:0 2px 8px rgba(0,122,255,0.25); }
+  .big-btn:active { transform:scale(.98); opacity:.9; }
+
+  /* Week groups */
+  .week-group { margin-bottom:24px; }
+  .week-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .week-bar { width:4px; height:24px; border-radius:2px; }
+  .week-title { font-size:16px; font-weight:700; letter-spacing:.3px; }
+
+  /* Session row */
+  .session-row { display:flex; align-items:center; gap:10px; border-radius:12px; padding:11px 14px; margin-bottom:4px; border:1px solid var(--border); background:var(--card); transition:all .15s; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+  .session-row:active { opacity:.85; }
+  .session-row.today { border:2px solid; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  .session-row.done { opacity:.5; }
+  .session-row.rest { background:#f0f0f3; }
+  .session-date { min-width:68px; font-size:11px; color:var(--dim); font-family:ui-monospace,'SF Mono',monospace; }
+  .session-label { flex:1; font-weight:600; font-size:13px; }
+  .session-label.rest-label { color:var(--vdim); }
+  .rest-notes { font-size:11px; color:var(--vdim); margin-top:3px; }
+  .session-status { font-size:12px; font-weight:700; }
+  .session-arrow { color:var(--vdim); font-size:14px; }
+  .skip-btn { padding:5px 10px; border-radius:6px; background:#fff0f0; color:var(--red); border:1px solid rgba(255,59,48,.15); font-size:10px; font-weight:700; }
+
+  /* Session detail */
+  .back-btn { padding:8px 14px; border-radius:8px; background:transparent; border:1px solid var(--border); color:var(--dim); font-size:12px; font-weight:600; margin-bottom:14px; }
+  .session-header { border-radius:12px; padding:16px 18px; margin-bottom:18px; }
+  .session-phase { font-size:10px; font-weight:700; letter-spacing:1.5px; margin-bottom:4px; }
+  .session-title { font-size:20px; font-weight:800; color:var(--text); }
+  .session-dateinfo { font-size:12px; color:var(--dim); margin-top:4px; }
+  .session-prog { margin-top:10px; display:flex; align-items:center; gap:10px; }
+  .session-prog-bar { flex:1; background:#e8e8ed; border-radius:6px; height:5px; overflow:hidden; }
+  .session-prog-fill { height:100%; border-radius:6px; transition:width .3s; }
+  .session-count { font-size:11px; font-weight:700; }
+
+  /* Tabs */
+  .tabs { display:flex; gap:3px; margin-bottom:18px; background:#e8e8ed; border-radius:10px; padding:3px; }
+  .tab-btn { flex:1; padding:9px 6px; border-radius:8px; background:transparent; color:var(--dim); font-weight:700; font-size:11px; letter-spacing:.3px; transition:all .15s; }
+  .tab-btn.active { color:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+
+  .section-count { font-size:12px; color:var(--dim); margin-bottom:12px; }
+
+  /* Checklist items */
+  .check-item { display:flex; gap:11px; align-items:flex-start; border-radius:12px; padding:13px 14px; margin-bottom:6px; border:1px solid var(--border); background:var(--card); transition:all .15s; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+  .check-item:active { opacity:.85; }
+  .check-item.done { opacity:.55; }
+  .checkbox { width:22px; height:22px; border-radius:6px; flex-shrink:0; margin-top:1px; border:2px solid #c7c7cc; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff; }
+  .checkbox.checked { border-color:inherit; }
+  .check-content { flex:1; }
+  .check-name { font-weight:700; font-size:13px; }
+  .check-name.done-text { text-decoration:line-through; color:var(--vdim); }
+  .check-tags { display:flex; gap:8px; margin-top:5px; flex-wrap:wrap; }
+  .tag { font-size:10px; font-weight:600; padding:3px 7px; border-radius:5px; background:#eef2ff; color:var(--blue); }
+  .tag.rest-tag { background:#eefbf0; color:var(--green); }
+  .check-notes { font-size:11px; color:var(--dim); margin-top:5px; line-height:1.4; font-style:italic; }
+  .check-link { display:inline-block; margin-top:5px; font-size:11px; color:var(--accent); text-decoration:none; font-weight:600; }
+  .check-link:hover { text-decoration:underline; }
+
+  /* Speed log box */
+  .speed-box { background:#fff8ee; border:1px solid rgba(255,149,0,.2); border-radius:12px; padding:14px; margin-top:4px; margin-bottom:6px; }
+  .speed-title { font-size:12px; font-weight:700; color:var(--yellow); margin-bottom:10px; }
+  .speed-inputs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .speed-group { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .speed-label { font-size:9px; color:var(--dim); letter-spacing:1px; }
+  .speed-input { width:58px; padding:7px 4px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--yellow); font-size:15px; font-weight:700; text-align:center; outline:none; }
+  .speed-input:focus { border-color:var(--yellow); box-shadow:0 0 0 3px rgba(255,149,0,0.15); }
+  .speed-avg { font-size:12px; color:var(--dim); margin-bottom:8px; }
+  .speed-save-btn { padding:9px 18px; border-radius:8px; background:var(--yellow); color:#fff; font-weight:800; font-size:13px; }
+  .speed-save-btn:disabled { opacity:.4; }
+  .speed-logged { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+  .speed-val { background:#fff3e0; color:#e67700; padding:3px 8px; border-radius:5px; font-size:12px; font-weight:600; }
+  .re-enter { padding:5px 10px; border-radius:6px; background:#fff0f0; color:var(--red); border:none; font-size:10px; font-weight:600; margin-top:8px; }
+
+  /* Nav buttons */
+  .nav-row { display:flex; justify-content:space-between; margin-top:20px; }
+  .nav-step { padding:9px 18px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--dim); font-weight:600; font-size:12px; }
+
+  /* Session complete banner */
+  .complete-banner { margin-top:20px; padding:18px; border-radius:12px; text-align:center; }
+  .complete-icon { font-size:28px; }
+  .complete-text { font-size:16px; font-weight:800; margin-top:6px; }
+  .complete-sub { font-size:12px; color:var(--dim); margin-top:4px; }
+
+  /* Speed Progress card on schedule */
+  .speed-progress-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:22px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+  .speed-progress-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .speed-progress-title { font-size:14px; font-weight:800; letter-spacing:.3px; }
+  .speed-progress-badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+  .speed-chart-svg { width:100%; overflow:visible; }
+  .speed-empty { text-align:center; padding:24px 10px; color:var(--vdim); font-size:13px; }
+
+  /* Speed tracker (full page) */
+  .tracker-title { font-size:22px; font-weight:800; margin-bottom:4px; color:var(--text); }
+  .tracker-sub { color:var(--dim); font-size:13px; margin-bottom:20px; }
+  .empty-state { text-align:center; padding:40px 20px; color:var(--vdim); }
+  .empty-icon { font-size:40px; }
+  .chart-box { background:var(--card); border-radius:14px; padding:18px 14px; margin-bottom:20px; border:1px solid var(--border); box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+  .chart-label { font-size:11px; color:var(--dim); letter-spacing:1px; margin-bottom:6px; font-weight:600; }
+  .log-title { font-size:13px; font-weight:700; color:var(--dim); letter-spacing:1px; margin-bottom:10px; }
+  .log-entry { display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:9px 12px; margin-bottom:5px; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+  .log-avg { font-weight:800; font-size:16px; color:var(--accent); min-width:50px; }
+  .log-info { flex:1; }
+  .log-week { font-size:11px; color:var(--dim); }
+  .log-date { font-size:10px; color:var(--vdim); }
+  .log-speeds { display:flex; gap:3px; }
+  .log-speed { font-size:10px; color:var(--dim); background:var(--bg); padding:2px 5px; border-radius:4px; }
+
+  /* Settings */
+  .settings-title { font-size:20px; font-weight:800; margin-bottom:18px; }
+  .settings-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:14px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+  .settings-card h3 { font-size:13px; font-weight:700; color:var(--dim); letter-spacing:1px; margin-bottom:10px; }
+  .settings-card p { font-size:12px; color:var(--dim); margin-bottom:10px; line-height:1.5; }
+  .skipped-tags { display:flex; gap:5px; flex-wrap:wrap; }
+  .skipped-tag { background:#fff0f0; color:var(--red); padding:4px 9px; border-radius:6px; font-size:11px; }
+  .skipped-remove { margin-left:5px; cursor:pointer; opacity:.7; }
+  .reset-btns { display:flex; gap:6px; flex-wrap:wrap; }
+  .reset-btn { padding:6px 12px; border-radius:6px; font-size:10px; font-weight:700; }
+  .info-text { font-size:12px; color:var(--dim); line-height:1.7; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div>
+      <h1>GOLF PERFORMANCE</h1>
+      <div class="sub">8-WEEK SPEED PROGRAM</div>
+    </div>
+    <div class="nav-btns">
+      <button class="nav-btn active" onclick="showView('schedule')" id="nav-schedule">📋</button>
+      <button class="nav-btn" onclick="showView('speed')" id="nav-speed">⚡</button>
+      <button class="nav-btn" onclick="showView('settings')" id="nav-settings">⚙️</button>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="app"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA & STATE
+// ═══════════════════════════════════════════════════════════════
+
+const START = '2025-03-02';
+let completed = {};
+let speedLog = {};
+let skippedDays = [];
+try {
+  completed = JSON.parse(localStorage.getItem('gc_done') || '{}');
+  speedLog = JSON.parse(localStorage.getItem('gc_speed') || '{}');
+  skippedDays = JSON.parse(localStorage.getItem('gc_skipped') || '[]');
+} catch(e) { console.log('Storage read error', e); }
+let currentView = 'schedule';
+let selectedSession = null;
+let activeTab = 'exercises';
+let speedInputs = ['','','','',''];
+
+const save = function() {
+  try {
+    localStorage.setItem('gc_done', JSON.stringify(completed));
+    localStorage.setItem('gc_speed', JSON.stringify(speedLog));
+    localStorage.setItem('gc_skipped', JSON.stringify(skippedDays));
+  } catch(e) { console.log('Storage write error', e); }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// REFERENCE LINKS — curated for each exercise, drill, speed item
+// ═══════════════════════════════════════════════════════════════
+
+const LINKS = {
+  // ═══════════════════════════════════════════════════════════
+  // EXERCISES — Verified YouTube links from active channels
+  // Sources: ATHLEAN-X, Jeff Nippard, Squat University, Renaissance Periodization,
+  //          Prehab Guys, Mike Reinold, Golf Forever, Fit For Golf, Mind Pump
+  // ═══════════════════════════════════════════════════════════
+  "Foam Roll – T-Spine": "https://www.youtube.com/results?search_query=foam+roll+thoracic+spine+golf+mobility",
+  "90/90 Hip Switches": "https://www.youtube.com/results?search_query=90+90+hip+switches+golf+mobility+drill",
+  "Dead Bugs": "https://www.youtube.com/results?search_query=dead+bug+exercise+proper+form+core+golf",
+  "Glute Bridges": "https://www.youtube.com/results?search_query=glute+bridge+exercise+proper+form+golf+fitness",
+  "Bird Dogs": "https://www.youtube.com/results?search_query=bird+dog+exercise+proper+form+core+stability",
+  "Pallof Press": "https://www.youtube.com/results?search_query=pallof+press+cable+band+anti+rotation+golf",
+  "Split Squats": "https://www.youtube.com/results?search_query=split+squat+proper+form+bodyweight+golf+fitness",
+  "Band Pull-Aparts": "https://www.youtube.com/results?search_query=band+pull+aparts+proper+form+shoulder+health",
+  "Foam Roll – Lats & Glutes": "https://www.youtube.com/results?search_query=foam+roll+lats+glutes+golf+mobility",
+  "World's Greatest Stretch": "https://www.youtube.com/results?search_query=worlds+greatest+stretch+golf+warm+up+mobility",
+  "Side-Lying Windmills": "https://www.youtube.com/results?search_query=side+lying+windmill+thoracic+rotation+mobility",
+  "Single-Leg RDL (bodyweight)": "https://www.youtube.com/results?search_query=single+leg+rdl+bodyweight+proper+form+golf",
+  "Half-Kneeling Chops": "https://www.youtube.com/results?search_query=half+kneeling+cable+chop+core+golf+rotation",
+  "Goblet Squats": "https://www.youtube.com/results?search_query=goblet+squat+proper+form+kettlebell+dumbbell",
+  "Push-Ups": "https://www.youtube.com/results?search_query=push+up+proper+form+technique+full+range",
+  "Plank Shoulder Taps": "https://www.youtube.com/results?search_query=plank+shoulder+taps+core+stability+anti+rotation",
+  "Foam Roll – Full Body": "https://www.youtube.com/results?search_query=full+body+foam+rolling+routine+golf+warm+up",
+  "Hip 90/90 with Reach": "https://www.youtube.com/results?search_query=90+90+hip+stretch+overhead+reach+thoracic+golf",
+  "Med Ball Slams": "https://www.youtube.com/results?search_query=medicine+ball+slam+proper+form+explosive+power",
+  "Single-Leg RDL (dumbbell)": "https://www.youtube.com/results?search_query=single+leg+romanian+deadlift+dumbbell+proper+form",
+  "Half-Kneeling Pallof Press + Rotation": "https://www.youtube.com/results?search_query=half+kneeling+pallof+press+rotation+golf+core",
+  "Lateral Lunges": "https://www.youtube.com/results?search_query=lateral+lunge+proper+form+hip+mobility+golf",
+  "TRX or Inverted Rows": "https://www.youtube.com/results?search_query=inverted+row+trx+row+proper+form+back",
+  "Foam Roll + Lacrosse Ball – Glutes": "https://www.youtube.com/results?search_query=lacrosse+ball+glute+release+piriformis+golf",
+  "Spiderman Stretch + Rotation": "https://www.youtube.com/results?search_query=spiderman+stretch+rotation+golf+hip+mobility",
+  "Rotational Med Ball Throws": "https://www.youtube.com/results?search_query=rotational+med+ball+throw+wall+golf+power",
+  "Romanian Deadlifts": "https://www.youtube.com/results?search_query=romanian+deadlift+rdl+proper+form+dumbbell",
+  "Push-Up to Rotation": "https://www.youtube.com/results?search_query=push+up+to+side+plank+rotation+core+golf",
+  "Pallof Press Walkouts": "https://www.youtube.com/results?search_query=pallof+press+walkout+anti+rotation+core",
+  "Bulgarian Split Squats": "https://www.youtube.com/results?search_query=bulgarian+split+squat+proper+form+dumbbell",
+  "Cable or Band Woodchops": "https://www.youtube.com/results?search_query=cable+woodchop+high+to+low+golf+rotational+power",
+  "Dynamic Warm-Up – High Knees, Butt Kicks, Arm Circles": "https://www.youtube.com/results?search_query=dynamic+warm+up+routine+high+knees+butt+kicks+golf",
+  "Explosive Med Ball Rotational Slams": "https://www.youtube.com/results?search_query=rotational+med+ball+slam+explosive+golf+power",
+  "Trap Bar Deadlifts or Heavy KB Swings": "https://www.youtube.com/results?search_query=kettlebell+swing+proper+form+hip+hinge+power",
+  "Single-Leg Squat to Box": "https://www.youtube.com/results?search_query=single+leg+squat+to+box+pistol+regression+form",
+  "Cable Rotations – Fast": "https://www.youtube.com/results?search_query=cable+rotation+fast+golf+core+rotational+speed",
+  "Lateral Bounds": "https://www.youtube.com/results?search_query=lateral+bounds+plyometric+explosive+golf+power",
+  "Renegade Rows": "https://www.youtube.com/results?search_query=renegade+row+proper+form+core+anti+rotation",
+  "Anti-Extension: Ab Wheel or Body Saw": "https://www.youtube.com/results?search_query=ab+wheel+rollout+proper+form+anti+extension+core",
+  "Foam Roll + Dynamic Stretching": "https://www.youtube.com/results?search_query=dynamic+stretching+routine+pre+workout+golf",
+  "Broad Jumps": "https://www.youtube.com/results?search_query=broad+jump+standing+long+jump+proper+form+explosive",
+  "Sumo Deadlifts": "https://www.youtube.com/results?search_query=sumo+deadlift+proper+form+technique+hip+power",
+  "Reverse Lunges with Rotation": "https://www.youtube.com/results?search_query=reverse+lunge+with+rotation+golf+core+mobility",
+  "Explosive Push-Ups (or clap push-ups)": "https://www.youtube.com/results?search_query=clap+push+ups+explosive+push+up+plyometric",
+  "Pallof Press ISO Hold": "https://www.youtube.com/results?search_query=pallof+press+isometric+hold+anti+rotation+core",
+  "Single-Arm Cable Press": "https://www.youtube.com/results?search_query=single+arm+cable+chest+press+anti+rotation+core",
+  "Copenhagen Plank": "https://www.youtube.com/results?search_query=copenhagen+plank+adductor+hip+strength+proper+form",
+  "Foam Roll + Mobility Flow": "https://www.youtube.com/results?search_query=foam+roll+mobility+flow+routine+golf+warm+up",
+  "Med Ball Rotational Throws – Max Intent": "https://www.youtube.com/results?search_query=med+ball+rotational+throw+wall+max+intent+golf",
+  "Trap Bar Deadlift or KB Swing": "https://www.youtube.com/results?search_query=kettlebell+swing+proper+form+hip+hinge+power+golf",
+  "Cable Woodchop – Fast": "https://www.youtube.com/results?search_query=cable+woodchop+fast+golf+rotational+speed+power",
+  "TRX Rows": "https://www.youtube.com/results?search_query=trx+row+inverted+row+proper+form+back+strength",
+  "Plank Variations – Mix It Up": "https://www.youtube.com/results?search_query=plank+variations+front+side+shoulder+tap+core+golf",
+  "Dynamic Warm-Up": "https://www.youtube.com/results?search_query=full+body+dynamic+warm+up+routine+5+minutes+golf",
+  "Goblet Squat + Press": "https://www.youtube.com/results?search_query=goblet+squat+to+press+thruster+full+body+exercise",
+  "Rotational Med Ball Slams": "https://www.youtube.com/results?search_query=rotational+medicine+ball+slam+golf+power+core",
+  "Push-Up Variations": "https://www.youtube.com/results?search_query=push+up+variations+wide+narrow+staggered+golf+fitness",
+  "Farmer's Carries": "https://www.youtube.com/results?search_query=farmers+carry+walk+proper+form+grip+core+strength",
+  "Full Dynamic Warm-Up": "https://www.youtube.com/results?search_query=full+body+dynamic+warm+up+before+golf+5+minutes",
+  "Activation Circuit": "https://www.youtube.com/results?search_query=glute+core+shoulder+activation+circuit+pre+golf",
+  "Foam Roll + Dynamic Warm-Up": "https://www.youtube.com/results?search_query=foam+roll+dynamic+warm+up+golf+pre+workout",
+  "Glute Activation Circuit": "https://www.youtube.com/results?search_query=glute+activation+circuit+bridges+clamshells+golf",
+  "Foam Roll + Mobility": "https://www.youtube.com/results?search_query=foam+rolling+mobility+routine+golf+recovery",
+  "Full Warm-Up Routine": "https://www.youtube.com/results?search_query=pre+round+golf+warm+up+routine+full+body",
+  "Med Ball Circuit": "https://www.youtube.com/results?search_query=medicine+ball+circuit+slams+rotational+throws+golf",
+  "Explosive Med Ball Work": "https://www.youtube.com/results?search_query=explosive+medicine+ball+exercises+golf+power",
+
+  // ═══════════════════════════════════════════════════════════
+  // GOLF DRILLS — Verified YouTube search links to top results
+  // Sources: Danny Maude, Rick Shiels, Chris Ryan, Me And My Golf,
+  //          Eric Cogorno, Clay Ballard, Malaska Golf, Peter Finch
+  // ═══════════════════════════════════════════════════════════
+  "Alignment Stick – Feet/Shoulders/Target": "https://www.youtube.com/results?search_query=alignment+stick+setup+drill+golf+aim+target+line",
+  "Slow-Motion Takeaway": "https://www.youtube.com/results?search_query=slow+motion+takeaway+drill+golf+one+piece+takeaway",
+  "Feet-Together Wedge Shots": "https://www.youtube.com/results?search_query=feet+together+drill+golf+balance+wedge+shots",
+  "9-to-3 Pitch Shots": "https://www.youtube.com/results?search_query=9+to+3+pitch+shot+drill+golf+short+game",
+  "Gate Drill – Putting": "https://www.youtube.com/results?search_query=gate+drill+putting+two+tees+golf+stroke+path",
+  "Alignment Stick – Swing Path": "https://www.youtube.com/results?search_query=alignment+stick+swing+path+drill+inside+out+golf",
+  "Trail Arm Only Swings": "https://www.youtube.com/results?search_query=trail+arm+only+right+arm+only+drill+golf+swing+slot",
+  "Impact Bag / Towel Drill": "https://www.youtube.com/results?search_query=impact+bag+drill+golf+forward+shaft+lean+compress",
+  "Distance Control – Ladder Drill": "https://www.youtube.com/results?search_query=wedge+distance+control+ladder+drill+golf+practice",
+  "Clock Drill – Putting": "https://www.youtube.com/results?search_query=clock+drill+putting+around+the+hole+golf+practice",
+  "Step-Through Drill": "https://www.youtube.com/results?search_query=step+through+drill+golf+weight+transfer+power",
+  "Headcover Under Trail Arm": "https://www.youtube.com/results?search_query=headcover+under+arm+drill+golf+connection+swing",
+  "3/4 Swing – 7 Iron": "https://www.youtube.com/results?search_query=three+quarter+swing+drill+7+iron+golf+control",
+  "Wedge – Trajectory Control": "https://www.youtube.com/results?search_query=wedge+trajectory+control+low+medium+high+golf+drill",
+  "Lag Putting – 30-40 Footers": "https://www.youtube.com/results?search_query=lag+putting+drill+speed+control+long+putts+golf",
+  "Pump Drill – Transition": "https://www.youtube.com/results?search_query=pump+drill+golf+transition+downswing+sequence",
+  "Trail Foot Back Drill": "https://www.youtube.com/results?search_query=trail+foot+back+drill+golf+inside+swing+path",
+  "Scoring Zone: 80-120 Yards": "https://www.youtube.com/results?search_query=scoring+zone+80+120+yards+wedge+practice+golf",
+  "Up-and-Down Challenge": "https://www.youtube.com/results?search_query=up+and+down+challenge+short+game+practice+golf",
+  "Pressure Putting – Make 10 in a Row from 3ft": "https://www.youtube.com/results?search_query=pressure+putting+drill+make+10+in+a+row+3+feet+golf",
+  "Speed Swings with 7-Iron": "https://www.youtube.com/results?search_query=swing+speed+drill+7+iron+faster+golf+swing",
+  "Driver Tee Drill – Low Tee": "https://www.youtube.com/results?search_query=driver+low+tee+drill+center+contact+golf",
+  "3-Club Challenge": "https://www.youtube.com/results?search_query=3+club+challenge+practice+drill+range+golf",
+  "60-Yard Wedge with Max Spin": "https://www.youtube.com/results?search_query=60+yard+wedge+shot+spin+technique+golf+drill",
+  "Putting: AimPoint – Read & Commit": "https://www.youtube.com/results?search_query=aimpoint+putting+read+green+commit+to+line+golf",
+  "Driver – Bomb & Gauge Dispersion": "https://www.youtube.com/results?search_query=driver+dispersion+drill+accuracy+distance+golf",
+  "Stinger / Punch Shot Drill": "https://www.youtube.com/results?search_query=stinger+shot+punch+shot+drill+low+flight+golf",
+  "Random Club Selection Game": "https://www.youtube.com/results?search_query=random+club+selection+practice+game+golf+range",
+  "Bunker: Splash Drill": "https://www.youtube.com/results?search_query=bunker+splash+drill+sand+shot+technique+golf",
+  "9-Hole Putting Game": "https://www.youtube.com/results?search_query=9+hole+putting+game+practice+green+golf+drill",
+  "Full Pre-Shot Routine Practice": "https://www.youtube.com/results?search_query=pre+shot+routine+golf+practice+range+consistency",
+  "Stock Shot: Shape Your Go-To": "https://www.youtube.com/results?search_query=stock+shot+shape+draw+fade+go+to+shot+golf",
+  "Short Game: Up & Down from 5 Spots": "https://www.youtube.com/results?search_query=short+game+practice+up+and+down+chipping+golf+drill",
+  "Putting: Pressure Drill": "https://www.youtube.com/results?search_query=pressure+putting+drill+clutch+practice+golf",
+  "On-Course Simulation: Play 9 Holes on Range": "https://www.youtube.com/results?search_query=simulate+playing+golf+course+on+driving+range+practice",
+  "Driver: Fairway Accuracy Challenge": "https://www.youtube.com/results?search_query=driver+accuracy+challenge+fairway+target+golf+drill",
+  "Iron Play: Number Chasing": "https://www.youtube.com/results?search_query=iron+distance+control+carry+yardage+golf+practice",
+  "Scramble Drill: Bad Lie Recovery": "https://www.youtube.com/results?search_query=bad+lie+recovery+shot+scramble+golf+drill+creative",
+  "Putting: Speed Calibration": "https://www.youtube.com/results?search_query=putting+speed+control+calibration+lag+drill+golf",
+  "Full Warm-Up Routine Rehearsal": "https://www.youtube.com/results?search_query=pre+round+warm+up+routine+practice+golf+range",
+  "Stock Shot x10": "https://www.youtube.com/results?search_query=stock+shot+repetition+practice+golf+consistency",
+  "Driver: Let It Rip": "https://www.youtube.com/results?search_query=driver+max+distance+speed+drill+golf+bomb+it",
+
+  // ═══════════════════════════════════════════════════════════
+  // SPEED TRAINING — SuperSpeed Golf & The Stack System references
+  // ═══════════════════════════════════════════════════════════
+  "Warm-Up Swings – 50% Effort": "https://www.youtube.com/results?search_query=superspeed+golf+warm+up+protocol+level+1",
+  "Light Club Swings – 60%": "https://www.youtube.com/results?search_query=superspeed+golf+light+stick+overspeed+training",
+  "Medium Effort Swings – 75%": "https://www.youtube.com/results?search_query=superspeed+golf+training+protocol+medium+stick",
+  "Max Effort Swings – 100%": "https://www.youtube.com/results?search_query=superspeed+golf+max+effort+swing+speed+training",
+  "Cool Down Swings – 50%": "https://www.youtube.com/results?search_query=superspeed+golf+cool+down+protocol+speed+training",
+  "Warm-Up Swings – 50%": "https://www.youtube.com/results?search_query=golf+speed+training+warm+up+swings+protocol",
+  "Light Stick – 65%": "https://www.youtube.com/results?search_query=superspeed+golf+light+green+stick+overspeed",
+  "Medium Stick – 80%": "https://www.youtube.com/results?search_query=superspeed+golf+medium+blue+stick+training",
+  "Max Effort – Superspeed Protocol": "https://www.youtube.com/results?search_query=superspeed+golf+level+1+full+protocol+max+effort",
+  "Overspeed: Downhill or Lighter Club": "https://www.youtube.com/results?search_query=overspeed+training+golf+lighter+club+speed+gains",
+  "Cool Down – 50%": "https://www.youtube.com/results?search_query=speed+training+cool+down+golf+swing+protocol",
+  "Light Stick – 70%": "https://www.youtube.com/results?search_query=superspeed+golf+light+stick+build+up+speed",
+  "Heavy Stick – 80%": "https://www.youtube.com/results?search_query=superspeed+golf+heavy+red+stick+training+protocol",
+  "Max Effort Dominant Side": "https://www.youtube.com/results?search_query=superspeed+golf+dominant+side+max+speed+swings",
+  "Max Effort Non-Dominant Side": "https://www.youtube.com/results?search_query=superspeed+golf+non+dominant+left+handed+speed+training",
+  "Overspeed: Step-Through Max Swings": "https://www.youtube.com/results?search_query=step+through+speed+training+golf+swing+overspeed",
+  "Progressive Build: 60-70-80-90%": "https://www.youtube.com/results?search_query=golf+speed+training+progressive+build+up+protocol",
+  "Max Effort – Dominant Side": "https://www.youtube.com/results?search_query=golf+swing+speed+training+max+effort+dominant+side",
+  "Max Effort – Non-Dominant": "https://www.youtube.com/results?search_query=golf+speed+training+non+dominant+side+bilateral",
+};
+
+// ═══════════════════════════════════════════════════════════════
+// PROGRAM BUILDER
+// ═══════════════════════════════════════════════════════════════
+
+function item(name, sets, reps, rest, notes, type) {
+  return { name, sets, reps, rest, notes: notes||'', type, link: LINKS[name]||'' };
+}
+function ex(n,s,r,rest,notes) { return item(n,s,r,rest,notes,'exercise'); }
+function dr(n,s,r,rest,notes) { return item(n,s,r,rest,notes,'drill'); }
+function sp(n,s,r,rest,notes) { return item(n,s,r,rest,notes,'speed'); }
+
+// Foundation exercises
+const fEx1=[ex("Foam Roll – T-Spine",1,"60 sec","—","Slow rolls, pause on tight spots"),ex("90/90 Hip Switches",2,"10 each side","30s","Control the transition"),ex("Dead Bugs",3,"8 each side","30s","Press low back into floor, slow & controlled"),ex("Glute Bridges",3,"12","30s","Squeeze glutes hard at top, 2-sec hold"),ex("Bird Dogs",3,"8 each side","30s","Opposite arm/leg, keep hips square"),ex("Pallof Press",3,"10 each side","30s","Anti-rotation, press straight out from chest"),ex("Split Squats",3,"10 each side","45s","Bodyweight, knee tracks over toe"),ex("Band Pull-Aparts",3,"15","30s","Squeeze shoulder blades together")];
+const fEx2=[ex("Foam Roll – Lats & Glutes",1,"60 sec each","—","Find tender spots, breathe into them"),ex("World's Greatest Stretch",2,"5 each side","30s","Hold each position 3 seconds"),ex("Side-Lying Windmills",2,"8 each side","30s","Follow hand with eyes, open chest"),ex("Single-Leg RDL (bodyweight)",3,"8 each side","30s","Hinge at hips, flat back"),ex("Half-Kneeling Chops",3,"10 each side","30s","Cable or band, rotate from core"),ex("Goblet Squats",3,"12","45s","Elbows inside knees, chest up"),ex("Push-Ups",3,"10-12","30s","Full ROM, core tight"),ex("Plank Shoulder Taps",3,"8 each side","30s","Minimize hip sway")];
+
+const fDr1=[dr("Alignment Stick – Feet/Shoulders/Target",1,"10 balls","—","Place sticks on ground, check aim every shot"),dr("Slow-Motion Takeaway",1,"10 reps (no ball)","—","Club, hands, arms move together first 18 inches"),dr("Feet-Together Wedge Shots",1,"15 balls","—","PW or 9i, focus on balance & center contact"),dr("9-to-3 Pitch Shots",1,"15 balls","—","Arms swing hip to hip, body rotation drives motion"),dr("Gate Drill – Putting",1,"20 putts","—","Two tees just wider than putter face, 3-ft putts")];
+const fDr2=[dr("Alignment Stick – Swing Path",1,"10 balls","—","Stick angled on ground for inside path reference"),dr("Trail Arm Only Swings",1,"10 reps","—","Right arm only (for righties), feel the slot"),dr("Impact Bag / Towel Drill",1,"15 reps","—","Forward shaft lean at impact, compress the bag"),dr("Distance Control – Ladder Drill",1,"15 balls","—","Land balls at 30, 50, 70 yards progressively"),dr("Clock Drill – Putting",1,"12 putts","—","4 balls around hole at 3 ft, then 5 ft")];
+
+const fSp=[sp("Warm-Up Swings – 50% Effort",1,"5 swings","—","Smooth tempo, wake up the pattern"),sp("Light Club Swings – 60%",1,"5 swings","30s","Use alignment stick or speed stick (light)"),sp("Medium Effort Swings – 75%",3,"3 swings","45s","Feel the acceleration through the ball"),sp("Max Effort Swings – 100%",3,"3 swings","60s","FULL SEND. Audible whoosh past the ball"),sp("Cool Down Swings – 50%",1,"5 swings","—","Bring heart rate down, smooth it out"),sp("LOG 5 DRIVER SWINGS",1,"5 swings","—","⚡ Record each swing speed on your launch monitor")];
+
+// Build exercises
+const bEx1=[ex("Foam Roll – Full Body",1,"90 sec","—","T-spine, lats, glutes, quads"),ex("Hip 90/90 with Reach",2,"8 each side","30s","Add overhead reach for thoracic mobility"),ex("Med Ball Slams",3,"8","45s","Explosive! Triple extend then slam"),ex("Goblet Squats",3,"10","45s","Hold 15-25 lb, depth is key"),ex("Single-Leg RDL (dumbbell)",3,"8 each side","45s","Hold weight opposite hand to working leg"),ex("Half-Kneeling Pallof Press + Rotation",3,"8 each side","30s","Press out, then rotate toward anchor"),ex("Lateral Lunges",3,"8 each side","30s","Push hips back, knee tracks toe"),ex("TRX or Inverted Rows",3,"10","45s","Squeeze shoulder blades, pull to chest")];
+const bEx2=[ex("Foam Roll + Lacrosse Ball – Glutes",1,"90 sec","—","Deep tissue work on glute med"),ex("Spiderman Stretch + Rotation",2,"6 each side","30s","Lunge, plant hand, rotate & reach"),ex("Rotational Med Ball Throws",3,"6 each side","45s","Throw into wall, rotate from hips"),ex("Romanian Deadlifts",3,"10","60s","Dumbbells or barbell, hinge pattern"),ex("Push-Up to Rotation",3,"6 each side","45s","Push-up, then rotate to side plank, reach up"),ex("Pallof Press Walkouts",3,"8 each side","30s","Press out, then take 3 steps away from anchor"),ex("Bulgarian Split Squats",3,"8 each side","45s","Rear foot elevated, add dumbbells if able"),ex("Cable or Band Woodchops",3,"10 each side","30s","High-to-low, rotate from core")];
+
+const bDr1=[dr("Step-Through Drill",1,"10 balls","—","Step trail foot toward target post-impact, weight shift"),dr("Headcover Under Trail Arm",1,"10 balls","—","Keep connection, prevents arms flying away"),dr("3/4 Swing – 7 Iron",1,"15 balls","—","Control top of backswing, focus on transition sequence"),dr("Wedge – Trajectory Control",1,"15 balls","—","Hit 5 low, 5 mid, 5 high with same club"),dr("Lag Putting – 30-40 Footers",1,"15 putts","—","Get within 3 feet, speed is king")];
+const bDr2=[dr("Pump Drill – Transition",1,"10 reps","—","Backswing, start down, stop, re-hinge, then swing. Feel sequence."),dr("Trail Foot Back Drill",1,"10 balls","—","Drop trail foot back 6 inches, forces inside path"),dr("Scoring Zone: 80-120 Yards",1,"15 balls","—","Commit to specific yardages, track dispersion"),dr("Up-and-Down Challenge",1,"10 attempts","—","From off the green, try to get up & down in 2"),dr("Pressure Putting – Make 10 in a Row from 3ft",1,"Until done","—","Start over if you miss. Builds clutch nerves.")];
+
+const bSp=[sp("Warm-Up Swings – 50%",1,"5 swings","—","Smooth, controlled"),sp("Light Stick – 65%",2,"4 swings","30s","Speed stick or alignment stick"),sp("Medium Stick – 80%",3,"3 swings","45s","Really accelerate through the hitting zone"),sp("Max Effort – Superspeed Protocol",4,"3 swings","60s","Absolute max. Swing as hard as possible. Both sides."),sp("Overspeed: Downhill or Lighter Club",2,"3 swings","45s","Train the nervous system to fire faster"),sp("Cool Down – 50%",1,"5 swings","—","Easy swings"),sp("LOG 5 DRIVER SWINGS",1,"5 swings","—","⚡ Record each swing speed on your launch monitor")];
+
+// Peak exercises
+const pEx1=[ex("Dynamic Warm-Up – High Knees, Butt Kicks, Arm Circles",1,"60 sec total","—","Get the blood flowing"),ex("Explosive Med Ball Rotational Slams",3,"6 each side","45s","Maximum intent! Explode from the hips"),ex("Trap Bar Deadlifts or Heavy KB Swings",4,"6","90s","Heavy load, powerful hip extension"),ex("Single-Leg Squat to Box",3,"6 each side","60s","Control the descent, explode up"),ex("Cable Rotations – Fast",3,"8 each side","30s","Speed of rotation is the focus"),ex("Lateral Bounds",3,"6 each side","45s","Stick the landing, explosive push-off"),ex("Renegade Rows",3,"6 each side","45s","Plank position, row, minimize hip rotation"),ex("Anti-Extension: Ab Wheel or Body Saw",3,"8","45s","Core bracing under load")];
+const pEx2=[ex("Foam Roll + Dynamic Stretching",1,"3 min","—","Full body prep"),ex("Broad Jumps",3,"5","60s","Max distance, stick landing"),ex("Sumo Deadlifts",4,"6","90s","Wide stance, chest up, drive through floor"),ex("Reverse Lunges with Rotation",3,"8 each side","45s","Hold weight at chest, rotate over front leg"),ex("Explosive Push-Ups (or clap push-ups)",3,"5-6","60s","Explode off the ground"),ex("Pallof Press ISO Hold",3,"20 sec each side","30s","Pure anti-rotation endurance"),ex("Single-Arm Cable Press",3,"8 each side","30s","Staggered stance, resist rotation"),ex("Copenhagen Plank",3,"15 sec each side","30s","Adductor strength for ground force")];
+
+const pDr1=[dr("Speed Swings with 7-Iron",1,"10 balls","—","Swing at 90-95% effort, track ball speed if possible"),dr("Driver Tee Drill – Low Tee",1,"10 balls","—","Tee it low, forces solid center contact"),dr("3-Club Challenge",1,"15 balls","—","Hit 5 shots each: 7i, 5i, 3w – same target, commit to each"),dr("60-Yard Wedge with Max Spin",1,"10 balls","—","Clean contact, descending blow, check divot"),dr("Putting: AimPoint – Read & Commit",1,"15 putts","—","Pick a line, commit 100%, don't second guess")];
+const pDr2=[dr("Driver – Bomb & Gauge Dispersion",1,"10 balls","—","Full send, measure carry & total, track offline yards"),dr("Stinger / Punch Shot Drill",1,"10 balls","—","5-iron, ball back, hands forward, low flight"),dr("Random Club Selection Game",1,"15 balls","—","Alternate clubs randomly to simulate course play"),dr("Bunker: Splash Drill",1,"10 balls","—","Open face, bounce hits sand 2 inches behind ball"),dr("9-Hole Putting Game",1,"9 holes","—","Simulate 9 putts from various distances, score it")];
+
+const pSp=[sp("Warm-Up Swings – 50%",1,"5 swings","—","Easy does it"),sp("Light Stick – 70%",2,"3 swings","30s","Build up"),sp("Heavy Stick – 80%",2,"3 swings","45s","Overspeed training effect"),sp("Max Effort Dominant Side",4,"3 swings","60s","All-out effort. Chase the number."),sp("Max Effort Non-Dominant Side",3,"3 swings","60s","Cross-training fires new neural pathways"),sp("Overspeed: Step-Through Max Swings",2,"3 swings","45s","Step into it like a baseball swing"),sp("Cool Down – 50%",1,"5 swings","—","Smooth finish"),sp("LOG 5 DRIVER SWINGS",1,"5 swings","—","⚡ Record each swing speed on your launch monitor")];
+
+// Maintain exercises
+const mEx1=[ex("Foam Roll + Mobility Flow",1,"3 min","—","Full body, focus on any lingering tightness"),ex("Med Ball Rotational Throws – Max Intent",3,"5 each side","45s","Quality reps, max power"),ex("Trap Bar Deadlift or KB Swing",3,"5","90s","Moderate-heavy, maintain strength"),ex("Bulgarian Split Squats",3,"8 each side","60s","Stay strong in the legs"),ex("Cable Woodchop – Fast",3,"8 each side","30s","Speed is king here"),ex("Lateral Bounds",3,"5 each side","45s","Maintain explosiveness"),ex("TRX Rows",3,"10","30s","Keep the back strong"),ex("Plank Variations – Mix It Up",3,"30 sec","30s","Front, side, shoulder taps – keep core sharp")];
+const mEx2=[ex("Dynamic Warm-Up",1,"3 min","—","Light jog, arm circles, leg swings"),ex("Broad Jumps",3,"4","60s","Maintain power"),ex("Goblet Squat + Press",3,"8","60s","Squat, stand, press overhead – full body"),ex("Single-Leg RDL (dumbbell)",3,"8 each side","45s","Balance & posterior chain"),ex("Rotational Med Ball Slams",3,"5 each side","45s","Maintain rotational power"),ex("Push-Up Variations",3,"8-10","30s","Wide, narrow, staggered – mix it up"),ex("Pallof Press",3,"10 each side","30s","Core stability maintenance"),ex("Farmer's Carries",3,"40 yards","45s","Grip, core, total body stability")];
+
+const mDr1=[dr("Full Pre-Shot Routine Practice",1,"15 balls","—","Every shot gets the full routine – aim, visualize, commit"),dr("Stock Shot: Shape Your Go-To",1,"15 balls","—","Hit your reliable shape 15 times in a row"),dr("Short Game: Up & Down from 5 Spots",1,"10 attempts","—","Around the green, different lies, score yourself"),dr("Putting: Pressure Drill",1,"Make 5 from 5ft","—","Start over on a miss. Clutch reps."),dr("On-Course Simulation: Play 9 Holes on Range",1,"9 shots","—","Pick targets, change clubs, simulate real golf")];
+const mDr2=[dr("Driver: Fairway Accuracy Challenge",1,"10 balls","—","Pick a fairway-width target, count how many hit it"),dr("Iron Play: Number Chasing",1,"15 balls","—","Hit specific carry numbers with 7i, 8i, 9i"),dr("Scramble Drill: Bad Lie Recovery",1,"10 balls","—","Throw balls in rough/awkward spots, get creative"),dr("Putting: Speed Calibration",1,"15 putts","—","Putt to a fringe 30+ ft away. Dial in speed."),dr("Full Warm-Up Routine Rehearsal",1,"20 min","—","Practice your actual pre-round warm-up sequence")];
+
+const mSp=[sp("Warm-Up Swings – 50%",1,"5 swings","—","Protect the gains"),sp("Progressive Build: 60-70-80-90%",4,"2 swings each","30s","Ladder up smoothly"),sp("Max Effort – Dominant Side",4,"3 swings","60s","Stay aggressive. Don't leave speed on the table."),sp("Max Effort – Non-Dominant",2,"3 swings","60s","Neural cross-training"),sp("Cool Down – 50%",1,"5 swings","—","Easy finish"),sp("LOG 5 DRIVER SWINGS",1,"5 swings","—","⚡ Record each swing speed on your launch monitor")];
+
+// Light day helpers
+const lightEx1=[ex("Foam Roll – Full Body",1,"3 min","—","Just loosen up"),ex("Dynamic Warm-Up",1,"3 min","—","Leg swings, arm circles")];
+const lightEx2=[ex("Foam Roll + Dynamic Warm-Up",1,"5 min","—","Get loose"),ex("Glute Bridges",2,"10","30s","Activate before speed work")];
+const lightEx3=[ex("Foam Roll + Mobility",1,"5 min","—","Open everything up"),ex("Glute Activation Circuit",2,"10 each","30s","Bridges, clamshells, fire hydrants")];
+const lightEx4=[ex("Dynamic Warm-Up",1,"5 min","—","Get ready"),ex("Med Ball Slams",2,"6","30s","Prime the power")];
+const lightEx5=[ex("Dynamic Warm-Up",1,"5 min","—","Full body activation"),ex("Explosive Med Ball Work",2,"5","30s","Prime the nervous system")];
+const lightEx6=[ex("Full Dynamic Warm-Up",1,"5 min","—","Prep for peak speed"),ex("Lateral Bounds",2,"4 each","30s","Explosive activation")];
+const lightEx7=[ex("Full Warm-Up Routine",1,"5 min","—","This IS your pre-round routine now"),ex("Med Ball Circuit",2,"5 each exercise","30s","Slams + rotational throws")];
+const lightEx8=[ex("Full Dynamic Warm-Up",1,"5 min","—","The culmination of 8 weeks of work"),ex("Activation Circuit",1,"5 min","—","Glutes, core, shoulders – fire everything up")];
+const finalDrills=[dr("Stock Shot x10",1,"10 balls","—","Hit your go-to shot. Feel the confidence."),dr("Driver: Let It Rip",1,"10 balls","—","Full speed. See how far you've come.")];
+
+// ── 8-WEEK SCHEDULE ──
+const WEEKS=[
+{phase:"Foundation & Activation",weekNum:1,days:[
+  {label:"Day 1 – Foundation A",exercises:fEx1,drills:fDr1,speed:fSp},
+  {label:"Day 2 – Foundation B",exercises:fEx2,drills:fDr2,speed:fSp},
+  {label:"REST DAY",isRest:true,notes:"Active recovery: 20-min walk, light stretching, foam roll. Let your body adapt."},
+  {label:"Day 3 – Foundation A+",exercises:fEx1,drills:fDr2,speed:fSp},
+  {label:"Day 4 – Foundation B+",exercises:fEx2,drills:fDr1,speed:fSp},
+  {label:"REST DAY",isRest:true,notes:"Full rest or gentle yoga. Hydrate well. Sleep 7-8 hours."},
+  {label:"Day 5 – Light Speed Only",exercises:lightEx1,drills:fDr1,speed:fSp},
+]},
+{phase:"Foundation & Activation",weekNum:2,days:[
+  {label:"Day 1 – Foundation A (Progress)",exercises:fEx1,drills:fDr1,speed:fSp},
+  {label:"Day 2 – Foundation B (Progress)",exercises:fEx2,drills:fDr2,speed:fSp},
+  {label:"REST DAY",isRest:true,notes:"Walk 20-30 min. Light foam rolling. Mental game: visualize your swing."},
+  {label:"Day 3 – Foundation Mix",exercises:[...fEx1.slice(0,4),...fEx2.slice(4)],drills:fDr2,speed:fSp},
+  {label:"Day 4 – Foundation Full",exercises:fEx2,drills:fDr1,speed:fSp},
+  {label:"REST DAY",isRest:true,notes:"Rest day. Go spend time with the family! Your body needs recovery."},
+  {label:"Day 5 – Speed Focus",exercises:lightEx2,drills:fDr2,speed:fSp},
+]},
+{phase:"Building Power",weekNum:3,days:[
+  {label:"Day 1 – Power A",exercises:bEx1,drills:bDr1,speed:bSp},
+  {label:"Day 2 – Power B",exercises:bEx2,drills:bDr2,speed:bSp},
+  {label:"REST DAY",isRest:true,notes:"Recovery walk, stretching. Your muscles are adapting to the new load."},
+  {label:"Day 3 – Power A+",exercises:bEx1,drills:bDr2,speed:bSp},
+  {label:"Day 4 – Power B+",exercises:bEx2,drills:bDr1,speed:bSp},
+  {label:"REST DAY",isRest:true,notes:"Full rest. Family day. Trust the process."},
+  {label:"Day 5 – Speed + Drills",exercises:lightEx4,drills:bDr1,speed:bSp},
+]},
+{phase:"Building Power",weekNum:4,days:[
+  {label:"Day 1 – Power A (Intensity Up)",exercises:bEx1,drills:bDr1,speed:bSp},
+  {label:"Day 2 – Power B (Intensity Up)",exercises:bEx2,drills:bDr2,speed:bSp},
+  {label:"REST DAY",isRest:true,notes:"Light walk + foam roll. You're halfway through the program!"},
+  {label:"Day 3 – Power Mix",exercises:[...bEx1.slice(0,4),...bEx2.slice(4)],drills:bDr2,speed:bSp},
+  {label:"Day 4 – Power Full",exercises:bEx2,drills:bDr1,speed:bSp},
+  {label:"REST DAY",isRest:true,notes:"DELOAD FEEL: take it easy. 4 weeks of work banked. Recovery is growth."},
+  {label:"Day 5 – Light Speed",exercises:lightEx3,drills:bDr2,speed:bSp},
+]},
+{phase:"Peak Power & Speed",weekNum:5,days:[
+  {label:"Day 1 – Peak A",exercises:pEx1,drills:pDr1,speed:pSp},
+  {label:"Day 2 – Peak B",exercises:pEx2,drills:pDr2,speed:pSp},
+  {label:"REST DAY",isRest:true,notes:"You're in the peak phase. Sleep is your #1 supplement. Aim for 8 hours."},
+  {label:"Day 3 – Peak A+",exercises:pEx1,drills:pDr2,speed:pSp},
+  {label:"Day 4 – Peak B+",exercises:pEx2,drills:pDr1,speed:pSp},
+  {label:"REST DAY",isRest:true,notes:"Full rest. Stretch if you feel tight. Mental visualization."},
+  {label:"Day 5 – Speed Chase",exercises:lightEx5,drills:pDr1,speed:pSp},
+]},
+{phase:"Peak Power & Speed",weekNum:6,days:[
+  {label:"Day 1 – Peak A (Max Effort)",exercises:pEx1,drills:pDr1,speed:pSp},
+  {label:"Day 2 – Peak B (Max Effort)",exercises:pEx2,drills:pDr2,speed:pSp},
+  {label:"REST DAY",isRest:true,notes:"Recovery. Light stretching. You should be seeing speed gains by now!"},
+  {label:"Day 3 – Peak Mix",exercises:[...pEx1.slice(0,4),...pEx2.slice(4)],drills:pDr2,speed:pSp},
+  {label:"Day 4 – Peak Full",exercises:pEx2,drills:pDr1,speed:pSp},
+  {label:"REST DAY",isRest:true,notes:"Rest. Two weeks left. Stay committed but recover well."},
+  {label:"Day 5 – Speed & Drills",exercises:lightEx6,drills:pDr2,speed:pSp},
+]},
+{phase:"Maintain & Integrate",weekNum:7,days:[
+  {label:"Day 1 – Maintain A",exercises:mEx1,drills:mDr1,speed:mSp},
+  {label:"Day 2 – Maintain B",exercises:mEx2,drills:mDr2,speed:mSp},
+  {label:"REST DAY",isRest:true,notes:"Active rest. Play a casual round if you can – feel the gains!"},
+  {label:"Day 3 – Maintain A+",exercises:mEx1,drills:mDr2,speed:mSp},
+  {label:"Day 4 – Maintain B+",exercises:mEx2,drills:mDr1,speed:mSp},
+  {label:"REST DAY",isRest:true,notes:"Rest up. One week left. You've done incredible work."},
+  {label:"Day 5 – Integration",exercises:lightEx7,drills:mDr1,speed:mSp},
+]},
+{phase:"Maintain & Integrate",weekNum:8,days:[
+  {label:"Day 1 – Final Push A",exercises:mEx1,drills:mDr1,speed:mSp},
+  {label:"Day 2 – Final Push B",exercises:mEx2,drills:mDr2,speed:mSp},
+  {label:"REST DAY",isRest:true,notes:"Light day. Foam roll, stretch, visualize your best round."},
+  {label:"Day 3 – Final Push A+",exercises:mEx1,drills:mDr2,speed:mSp},
+  {label:"Day 4 – Final Push B+",exercises:mEx2,drills:mDr1,speed:mSp},
+  {label:"REST DAY",isRest:true,notes:"Recovery before your final speed test tomorrow!"},
+  {label:"FINAL DAY – Speed Test & Celebration",exercises:lightEx8,drills:finalDrills,speed:mSp},
+]},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// SCHEDULE COMPUTATION (with skipped day push-forward)
+// ═══════════════════════════════════════════════════════════════
+
+function buildSchedule() {
+  const all = [];
+  WEEKS.forEach((w,wi) => w.days.forEach((d,di) => all.push({...d, weekIdx:wi, dayIdx:di, originalWeek:w.weekNum, phase:w.phase})));
+  const parts = START.split('-');
+  const start = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  const schedule = [];
+  let cal = 0;
+  function toDS(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  for (let i = 0; i < all.length; i++) {
+    let dt = new Date(start.getTime()); dt.setDate(dt.getDate()+cal);
+    let ds = toDS(dt);
+    while (skippedDays.includes(ds)) { cal++; dt = new Date(start.getTime()); dt.setDate(dt.getDate()+cal); ds = toDS(dt); }
+    schedule.push({...all[i], date:new Date(dt.getTime()), dateStr:ds, sessionId:'w'+all[i].weekIdx+'-d'+all[i].dayIdx});
+    cal++;
+  }
+  return schedule;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+
+const PHASE_COLORS={"Foundation & Activation":"#34c759","Building Power":"#007aff","Peak Power & Speed":"#ff3b30","Maintain & Integrate":"#ff9500"};
+function pc(phase) { return PHASE_COLORS[phase]||'#4ade80'; }
+function fmt(d) {
+  try {
+    var dt = new Date(d);
+    var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return days[dt.getDay()] + ', ' + months[dt.getMonth()] + ' ' + dt.getDate();
+  } catch(e) { return ''; }
+}
+function today() {
+  var d = new Date();
+  var y = d.getFullYear();
+  var m = String(d.getMonth()+1).padStart(2,'0');
+  var day = String(d.getDate()).padStart(2,'0');
+  return y + '-' + m + '-' + day;
+}
+
+function sessionItems(s) { return [...(s.exercises||[]),...(s.drills||[]),...(s.speed||[])]; }
+function sessionProg(s) {
+  if (s.isRest) return 100;
+  const items = sessionItems(s);
+  if (!items.length) return 0;
+  return Math.round(items.filter((_,i)=>completed[s.sessionId+'-'+i]).length/items.length*100);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SVG LINE CHART — Date x MPH, auto-scaling
+// ═══════════════════════════════════════════════════════════════
+
+function buildLineChart(entries) {
+  var data = entries.map(function(e) {
+    var d = Array.isArray(e) ? e[1] : e;
+    return { avg: d.avg, date: d.date, speeds: d.speeds || [] };
+  });
+  if (!data.length) return '';
+
+  // Chart dimensions
+  var W = 580, H = 200;
+  var padL = 42, padR = 16, padT = 24, padB = 44;
+  var cW = W - padL - padR;
+  var cH = H - padT - padB;
+
+  // Y-axis: auto-scale with padding
+  var avgs = data.map(function(d){return d.avg;});
+  var yMin = Math.floor(Math.min.apply(null, avgs) - 2);
+  var yMax = Math.ceil(Math.max.apply(null, avgs) + 2);
+  if (yMax - yMin < 5) { yMin -= 2; yMax += 2; }
+  var yRange = yMax - yMin;
+
+  // X positions evenly spaced
+  var points = data.map(function(d, i) {
+    var x = padL + (data.length === 1 ? cW / 2 : (i / (data.length - 1)) * cW);
+    var y = padT + cH - ((d.avg - yMin) / yRange) * cH;
+    return { x: x, y: y, avg: d.avg, date: d.date };
+  });
+
+  // Build SVG
+  var svg = '<svg class="speed-chart-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">';
+
+  // Grid lines and Y labels
+  var gridSteps = 4;
+  for (var g = 0; g <= gridSteps; g++) {
+    var gy = padT + (g / gridSteps) * cH;
+    var gVal = (yMax - (g / gridSteps) * yRange).toFixed(0);
+    svg += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '" stroke="#e8e8ed" stroke-width="1"/>';
+    svg += '<text x="' + (padL - 8) + '" y="' + (gy + 4) + '" text-anchor="end" fill="#86868b" font-size="10" font-family="-apple-system,system-ui,sans-serif">' + gVal + '</text>';
+  }
+
+  // Area gradient
+  svg += '<defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">';
+  svg += '<stop offset="0%" stop-color="#007aff" stop-opacity="0.15"/>';
+  svg += '<stop offset="100%" stop-color="#007aff" stop-opacity="0.02"/>';
+  svg += '</linearGradient></defs>';
+
+  // Area fill
+  if (points.length > 1) {
+    var areaPath = 'M' + points[0].x + ',' + points[0].y;
+    for (var a = 1; a < points.length; a++) areaPath += ' L' + points[a].x + ',' + points[a].y;
+    areaPath += ' L' + points[points.length-1].x + ',' + (padT + cH);
+    areaPath += ' L' + points[0].x + ',' + (padT + cH) + ' Z';
+    svg += '<path d="' + areaPath + '" fill="url(#areaGrad)"/>';
+  }
+
+  // Line
+  if (points.length > 1) {
+    var linePath = 'M' + points[0].x + ',' + points[0].y;
+    for (var l = 1; l < points.length; l++) linePath += ' L' + points[l].x + ',' + points[l].y;
+    svg += '<path d="' + linePath + '" fill="none" stroke="#007aff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
+
+  // Dots, values, and date labels
+  for (var p = 0; p < points.length; p++) {
+    var pt = points[p];
+    // Dot
+    svg += '<circle cx="' + pt.x + '" cy="' + pt.y + '" r="4.5" fill="#007aff" stroke="#fff" stroke-width="2"/>';
+    // Value above dot
+    svg += '<text x="' + pt.x + '" y="' + (pt.y - 10) + '" text-anchor="middle" fill="#1d1d1f" font-size="11" font-weight="700" font-family="-apple-system,system-ui,sans-serif">' + pt.avg + '</text>';
+    // Date below axis
+    var dateLabel = fmtShort(pt.date);
+    svg += '<text x="' + pt.x + '" y="' + (H - 8) + '" text-anchor="middle" fill="#86868b" font-size="9" font-family="-apple-system,system-ui,sans-serif">' + dateLabel + '</text>';
+  }
+
+  // Axis labels
+  svg += '<text x="' + (W / 2) + '" y="' + (H - 0) + '" text-anchor="middle" fill="#aeaeb2" font-size="9" font-family="-apple-system,system-ui,sans-serif"></text>';
+  svg += '</svg>';
+  return svg;
+}
+
+function fmtShort(d) {
+  try {
+    var dt = new Date(d);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[dt.getMonth()] + ' ' + dt.getDate();
+  } catch(e) { return ''; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+
+function render() {
+  const app = document.getElementById('app');
+  if (currentView==='schedule') app.innerHTML=renderSchedule();
+  else if (currentView==='session') app.innerHTML=renderSession();
+  else if (currentView==='speed') app.innerHTML=renderSpeedTracker();
+  else if (currentView==='settings') app.innerHTML=renderSettings();
+
+  // Update nav buttons
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const v = currentView==='session'?'schedule':currentView;
+  const el = document.getElementById('nav-'+v);
+  if(el) el.classList.add('active');
+}
+
+function showView(v) { currentView=v; selectedSession=null; render(); }
+
+// ── SCHEDULE VIEW ──
+function renderSchedule() {
+  const sched = buildSchedule();
+  const t = today();
+
+  // Stats
+  const trainDays = sched.filter(s=>!s.isRest);
+  const overall = trainDays.length ? Math.round(trainDays.reduce((a,s)=>a+sessionProg(s),0)/trainDays.length) : 0;
+  const entries = Object.entries(speedLog).sort((a,b)=>new Date(a[1].date)-new Date(b[1].date));
+  const gained = entries.length>=2 ? (entries[entries.length-1][1].avg - entries[0][1].avg).toFixed(1) : null;
+
+  let html = `<div style="display:flex;gap:8px;margin-bottom:14px">`;
+  html += `<div class="stat-card" style="flex:2"><div class="num">${overall}%</div><div class="label">PROGRAM COMPLETE</div></div>`;
+  if (gained!==null) {
+    html+=`<div class="stat-card"><div class="num" style="color:${gained>=0?'var(--green)':'var(--red)'}">${gained>=0?'+':''}${gained}</div><div class="label">MPH GAINED</div></div>`;
+    html+=`<div class="stat-card"><div class="num" style="color:var(--accent)">${entries[entries.length-1][1].avg}</div><div class="label">CURRENT MPH</div></div>`;
+  }
+  html+=`</div>`;
+  html+=`<div class="prog-bar"><div class="prog-fill rainbow" style="width:${overall}%"></div></div>`;
+
+  // Speed Progress card with SVG line chart
+  html+=`<div class="speed-progress-card">`;
+  html+=`<div class="speed-progress-header"><div class="speed-progress-title">⚡ Speed Progress</div>`;
+  if(entries.length) html+=`<div class="speed-progress-badge" style="background:#eef6ff;color:var(--accent)">${entries[entries.length-1][1].avg} mph</div>`;
+  html+=`</div>`;
+
+  if(!entries.length){
+    html+=`<div class="speed-empty">Complete a speed session to start tracking your driver swing speed</div>`;
+  } else {
+    html += buildLineChart(entries);
+  }
+  html+=`</div>`;
+
+  // Today/Next button
+  const todayS = sched.find(s=>s.dateStr===t && !s.isRest);
+  const nextInc = sched.find(s=>{if(s.isRest)return false; return sessionProg(s)<100;});
+  if (todayS) html+=`<button class="big-btn" onclick="openSession('${todayS.sessionId}')">▶ START TODAY – ${esc(todayS.label)}</button>`;
+  else if (nextInc) html+=`<button class="big-btn" onclick="openSession('${nextInc.sessionId}')">▶ NEXT SESSION – ${esc(nextInc.label)}</button>`;
+
+  // Grouped by week
+  const groups={};
+  sched.forEach(s=>{
+    const k = `Week ${s.originalWeek} – ${s.phase}`;
+    if(!groups[k]) groups[k]={phase:s.phase,sessions:[]};
+    groups[k].sessions.push(s);
+  });
+
+  for (const [key,g] of Object.entries(groups)) {
+    const c = pc(g.phase);
+    html+=`<div class="week-group"><div class="week-header"><div class="week-bar" style="background:${c}"></div><div class="week-title" style="color:${c}">${key}</div></div>`;
+    g.sessions.forEach(s=>{
+      const prog=sessionProg(s); const isT=s.dateStr===t; const past=s.dateStr<t;
+      let cls='session-row'; if(isT)cls+=' today'; if(s.isRest)cls+=' rest'; if(!s.isRest&&prog===100)cls+=' done';
+      const border=isT?`border-color:${c}`:'';
+      const click=s.isRest?'':`onclick="openSession('${s.sessionId}')"`;
+      html+=`<div class="${cls}" style="${border}" ${click}>`;
+      html+=`<div class="session-date">${fmt(s.date)}</div>`;
+      html+=`<div style="flex:1">`;
+      html+=`<div class="session-label${s.isRest?' rest-label':''}">${s.isRest?'🛌 ':''}${esc(s.label)}</div>`;
+      if(s.isRest&&s.notes) html+=`<div class="rest-notes">${esc(s.notes)}</div>`;
+      html+=`</div>`;
+      if(!s.isRest){
+        if(prog===100) html+=`<span style="color:var(--green);font-size:16px">✓</span>`;
+        else if(prog>0) html+=`<span class="session-status" style="color:${c}">${prog}%</span>`;
+        html+=`<span class="session-arrow">›</span>`;
+      }
+      if(!s.isRest && past && prog===0) html+=`<button class="skip-btn" onclick="event.stopPropagation();skipDay('${s.dateStr}')">Skip</button>`;
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  }
+  return html;
+}
+
+// ── SESSION VIEW ──
+function renderSession() {
+  if(!selectedSession) return '';
+  const s = selectedSession;
+  const c = pc(s.phase);
+  const allItems = sessionItems(s);
+  const totalDone = allItems.filter((_,i)=>completed[s.sessionId+'-'+i]).length;
+
+  const sections = {exercises:{title:'💪 EXERCISES',items:s.exercises||[]},drills:{title:'🏌️ GOLF DRILLS',items:s.drills||[]},speed:{title:'⚡ SPEED TRAINING',items:s.speed||[]}};
+  const sec = sections[activeTab];
+  let offset=0;
+  if(activeTab==='drills') offset=(s.exercises||[]).length;
+  if(activeTab==='speed') offset=(s.exercises||[]).length+(s.drills||[]).length;
+  const secDone = sec.items.filter((_,i)=>completed[s.sessionId+'-'+(offset+i)]).length;
+
+  let html=`<button class="back-btn" onclick="showView('schedule')">← Back to Schedule</button>`;
+  html+=`<div class="session-header" style="background:${c}0d;border:1px solid ${c}25">`;
+  html+=`<div class="session-phase" style="color:${c}">WEEK ${s.originalWeek} · ${s.phase.toUpperCase()}</div>`;
+  html+=`<div class="session-title">${esc(s.label)}</div>`;
+  html+=`<div class="session-dateinfo">${fmt(s.date)}</div>`;
+  html+=`<div class="session-prog"><div class="session-prog-bar"><div class="session-prog-fill" style="width:${Math.round(totalDone/allItems.length*100)}%;background:${c}"></div></div><span class="session-count" style="color:${c}">${totalDone}/${allItems.length}</span></div>`;
+  html+=`</div>`;
+
+  // Tabs
+  html+=`<div class="tabs">`;
+  for(const[k,v] of Object.entries(sections)){
+    html+=`<button class="tab-btn${activeTab===k?' active':''}" style="${activeTab===k?'background:'+c:''}" onclick="setTab('${k}')">${v.title}</button>`;
+  }
+  html+=`</div>`;
+  html+=`<div class="section-count">${secDone}/${sec.items.length} complete in this section</div>`;
+
+  // Items
+  sec.items.forEach((item,idx)=>{
+    const gIdx = offset+idx;
+    const done = completed[s.sessionId+'-'+gIdx];
+    const isLog = item.name.includes('LOG 5 DRIVER');
+    const clickAttr = isLog?'':`onclick="toggleItem('${s.sessionId}',${gIdx})"`;
+
+    html+=`<div class="check-item${done?' done':''}" ${clickAttr}>`;
+    html+=`<div class="checkbox${done?' checked':''}" style="${done?'background:'+c+';border-color:'+c:''}">${done?'✓':''}</div>`;
+    html+=`<div class="check-content">`;
+    html+=`<div class="check-name${done?' done-text':''}">${esc(item.name)}</div>`;
+    html+=`<div class="check-tags"><span class="tag">${item.sets>1?item.sets+' sets':item.sets+' set'} × ${esc(item.reps)}</span>`;
+    if(item.rest!=='—') html+=`<span class="tag rest-tag">Rest: ${esc(item.rest)}</span>`;
+    html+=`</div>`;
+    if(item.notes) html+=`<div class="check-notes">💡 ${esc(item.notes)}</div>`;
+    if(item.link && !isLog) html+=`<a href="${item.link}" target="_blank" rel="noopener" class="check-link" onclick="event.stopPropagation()">🎬 How-To Videos →</a>`;
+    html+=`</div></div>`;
+
+    // Speed log box
+    if(isLog){
+      const hasLog = speedLog[s.sessionId];
+      html+=`<div class="speed-box">`;
+      if(hasLog){
+        html+=`<div class="speed-title">✅ SPEED LOGGED – Average: ${hasLog.avg} mph</div>`;
+        html+=`<div class="speed-logged">${hasLog.speeds.map(v=>`<span class="speed-val">${v} mph</span>`).join('')}</div>`;
+        html+=`<button class="re-enter" onclick="reenterSpeed('${s.sessionId}')">Re-enter speeds</button>`;
+      } else {
+        html+=`<div class="speed-title">⚡ LOG YOUR 5 DRIVER SWINGS</div>`;
+        html+=`<div class="speed-inputs">`;
+        for(let i=0;i<5;i++){
+          html+=`<div class="speed-group"><span class="speed-label">SWING ${i+1}</span><input class="speed-input" type="number" inputmode="decimal" id="spd${i}" value="${speedInputs[i]}" onchange="updateSpeedInput(${i},this.value)" placeholder="mph"></div>`;
+        }
+        html+=`</div>`;
+        const vals=speedInputs.map(Number).filter(n=>n>0);
+        if(vals.length) html+=`<div class="speed-avg">Average: ${(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)} mph</div>`;
+        html+=`<button class="speed-save-btn" onclick="saveSpeed('${s.sessionId}',${gIdx})" ${vals.length?'':'disabled'}>Save Speed Log</button>`;
+      }
+      html+=`</div>`;
+    }
+  });
+
+  // Nav
+  html+=`<div class="nav-row">`;
+  if(activeTab==='exercises') html+=`<div></div><button class="nav-step" onclick="setTab('drills')">Drills →</button>`;
+  if(activeTab==='drills') html+=`<button class="nav-step" onclick="setTab('exercises')">← Exercises</button><button class="nav-step" onclick="setTab('speed')">Speed →</button>`;
+  if(activeTab==='speed') html+=`<button class="nav-step" onclick="setTab('drills')">← Drills</button><div></div>`;
+  html+=`</div>`;
+
+  if(totalDone===allItems.length) {
+    html+=`<div class="complete-banner" style="background:${c}0d;border:2px solid ${c}"><div class="complete-icon">🎉</div><div class="complete-text" style="color:${c}">SESSION COMPLETE!</div><div class="complete-sub">Great work today. Recovery starts now.</div></div>`;
+  }
+  return html;
+}
+
+// ── SPEED TRACKER ──
+function renderSpeedTracker() {
+  const sched = buildSchedule();
+  const entries = Object.entries(speedLog).map(function(pair){
+    var id = pair[0], data = pair[1];
+    var s = sched.find(function(x){return x.sessionId===id;});
+    return {avg:data.avg, speeds:data.speeds, date:data.date, sessionId:id, week:s?s.originalWeek:0};
+  }).sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+
+  var html='<div class="tracker-title">⚡ Speed Progress</div><div class="tracker-sub">Driver clubhead speed across your 8-week program</div>';
+
+  if(!entries.length){
+    html+='<div class="empty-state"><div class="empty-icon">🏌️</div><div style="margin-top:12px">No speed data yet. Complete a speed session to start tracking!</div></div>';
+    return html;
+  }
+
+  var base=entries[0].avg, curr=entries[entries.length-1].avg, peak=Math.max.apply(null,entries.map(function(e){return e.avg;}));
+  var change = (curr-base).toFixed(1);
+
+  // Hero chart card
+  html+='<div class="chart-box">';
+  html+='<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">';
+  html+='<div><span style="font-size:32px;font-weight:800;color:var(--text)">'+curr+'</span><span style="font-size:14px;color:var(--dim);margin-left:4px">mph</span></div>';
+  if(entries.length>=2) {
+    html+='<div style="font-size:14px;font-weight:700;color:'+(change>=0?'var(--green)':'var(--red)')+';background:'+(change>=0?'#eefbf0':'#fff0f0')+';padding:4px 10px;border-radius:8px">'+(change>=0?'↑ +':'↓ ')+change+' mph</div>';
+  }
+  html+='</div>';
+  html+=buildLineChart(entries);
+
+  // Inline stats row below chart
+  html+='<div style="display:flex;gap:0;margin-top:14px;border-top:1px solid var(--border);padding-top:12px">';
+  html+='<div style="flex:1;text-align:center"><div style="font-size:10px;color:var(--vdim);letter-spacing:.8px;margin-bottom:2px">BASELINE</div><div style="font-size:16px;font-weight:800;color:var(--dim)">'+base+'</div></div>';
+  html+='<div style="width:1px;background:var(--border)"></div>';
+  html+='<div style="flex:1;text-align:center"><div style="font-size:10px;color:var(--vdim);letter-spacing:.8px;margin-bottom:2px">CURRENT</div><div style="font-size:16px;font-weight:800;color:var(--accent)">'+curr+'</div></div>';
+  html+='<div style="width:1px;background:var(--border)"></div>';
+  html+='<div style="flex:1;text-align:center"><div style="font-size:10px;color:var(--vdim);letter-spacing:.8px;margin-bottom:2px">PEAK</div><div style="font-size:16px;font-weight:800;color:var(--green)">'+peak+'</div></div>';
+  html+='<div style="width:1px;background:var(--border)"></div>';
+  html+='<div style="flex:1;text-align:center"><div style="font-size:10px;color:var(--vdim);letter-spacing:.8px;margin-bottom:2px">SESSIONS</div><div style="font-size:16px;font-weight:800;color:var(--text)">'+entries.length+'</div></div>';
+  html+='</div>';
+  html+='</div>';
+
+  // Session log — compact
+  html+='<div class="log-title">SESSION LOG</div>';
+  entries.forEach(function(e){
+    html+='<div class="log-entry"><div class="log-avg">'+e.avg+'</div><div class="log-info"><div class="log-week">Week '+e.week+'</div><div class="log-date">'+fmt(e.date)+'</div></div><div class="log-speeds">'+e.speeds.map(function(s){return '<span class="log-speed">'+s+'</span>';}).join('')+'</div></div>';
+  });
+  return html;
+}
+
+// ── SETTINGS ──
+function renderSettings() {
+  let html=`<div class="settings-title">⚙️ Manage Program</div>`;
+  html+=`<div class="settings-card"><h3>MISSED DAYS</h3><p>If you missed a training day, use the "Skip" button on past incomplete days in the schedule. All remaining sessions push forward automatically.</p>`;
+  if(skippedDays.length){
+    html+=`<div class="skipped-tags">${skippedDays.sort().map(d=>`<span class="skipped-tag">${d}<span class="skipped-remove" onclick="unskip('${d}')">✕</span></span>`).join('')}</div>`;
+  } else {
+    html+=`<p style="color:var(--vdim)">No skipped days yet. Life happens – no judgment here.</p>`;
+  }
+  html+=`</div>`;
+
+  html+=`<div class="settings-card"><h3>RESET OPTIONS</h3><div class="reset-btns">`;
+  html+=`<button class="reset-btn" style="background:#fff0f0;color:var(--red);border:1px solid rgba(255,59,48,.15)" onclick="resetProgress()">Reset Checkmarks</button>`;
+  html+=`<button class="reset-btn" style="background:#fff8ee;color:var(--yellow);border:1px solid rgba(255,149,0,.15)" onclick="resetSpeed()">Reset Speed Log</button>`;
+  html+=`<button class="reset-btn" style="background:#eef2ff;color:var(--accent);border:1px solid rgba(0,122,255,.15)" onclick="fullReset()">Full Reset</button>`;
+  html+=`</div></div>`;
+
+  html+=`<div class="settings-card"><h3>PROGRAM INFO</h3><div class="info-text">`;
+  html+=`<strong>Start Date:</strong> March 2, 2025<br><strong>Duration:</strong> 8 Weeks (56 days + skipped)<br><strong>Training Days:</strong> 5 per week<br><strong>Rest Days:</strong> 2 per week (built in)<br><br>`;
+  html+=`<strong>Phases:</strong><br>`;
+  html+=`<span style="color:#34c759">●</span> Weeks 1-2: Foundation & Activation<br>`;
+  html+=`<span style="color:#007aff">●</span> Weeks 3-4: Building Power<br>`;
+  html+=`<span style="color:#ff3b30">●</span> Weeks 5-6: Peak Power & Speed<br>`;
+  html+=`<span style="color:#ff9500">●</span> Weeks 7-8: Maintain & Integrate`;
+  html+=`</div></div>`;
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════════════════════
+
+function openSession(id) {
+  const sched = buildSchedule();
+  selectedSession = sched.find(s=>s.sessionId===id);
+  activeTab='exercises';
+  currentView='session';
+  render();
+  window.scrollTo(0,0);
+}
+
+function setTab(t) { activeTab=t; render(); }
+
+function toggleItem(sid, idx) {
+  const k=sid+'-'+idx;
+  if(completed[k]) delete completed[k]; else completed[k]=true;
+  save(); render();
+}
+
+function skipDay(ds) {
+  if(!skippedDays.includes(ds)){ skippedDays.push(ds); save(); render(); }
+}
+function unskip(ds) {
+  skippedDays=skippedDays.filter(d=>d!==ds); save(); render();
+}
+
+function updateSpeedInput(i,v) { speedInputs[i]=v; render(); }
+
+function saveSpeed(sid, gIdx) {
+  const vals=speedInputs.map(Number).filter(n=>n>0);
+  if(!vals.length)return;
+  const avg=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*10)/10;
+  speedLog[sid]={speeds:vals,avg:avg,date:new Date().toString()};
+  completed[sid+'-'+gIdx]=true;
+  speedInputs=['','','','',''];
+  save(); render();
+}
+
+function reenterSpeed(sid) {
+  delete speedLog[sid];
+  save(); render();
+}
+
+function resetProgress() { if(window.confirm('Reset all checkmarks? Speed data will be kept.')){completed={}; save(); render();} }
+function resetSpeed() { if(window.confirm('Delete all speed logs?')){speedLog={}; save(); render();} }
+function fullReset() { if(window.confirm('FULL RESET: Delete ALL data?')){completed={};speedLog={};skippedDays=[]; save(); render();} }
+
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// ── INIT ──
+render();
+</script>
+</body>
+</html>
